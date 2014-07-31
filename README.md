@@ -15,7 +15,9 @@ You MUST also place "authorized_keys" within this repository (ignored in .gitign
 
 The docker container should be run something like this:
 
-```docker run -t -d -p 2222:22 -p 3000:3000/udp -p 3001:3001/udp -p 3002:3002/udp -p 3003:3003/udp -p 3004:3004/udp -p 3005:3005/udp -v /var/run/docker.sock:/var/run/docker.sock -e HOST_HOME_LOCATION=/mnt/storage/john -v /mnt/storage/john:/home/john --name="johnae-dev" johnae/dev /usr/sbin/runsvdir-start```
+```docker run -t -d -p 2222:22 -p 3000:3000/udp -p 3001:3001/udp -p 3002:3002/udp -p 3003:3003/udp -p 3004:3004/udp -p 3005:3005/udp -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST_HOME_LOCATION=/mnt/storage/john -v /mnt/storage/john:/home/john --name="johnae-dev" johnae/dev```
+
+The default entrypoint is /entrypoint.sh which will also setup any env vars set starting with DOCKER_ using the file /etc/profile.d/docker-env.sh (created on container startup). Thus no entrypoint is needed as the image already has the default one set.
 
 As can be seen, above we're mounting the user home from the host. That way the container may be thrown away while keeping the important data. We also mount the hosts docker.sock inside the container which enables us to use docker from within the container to launch additional containers on the host. This is very useful in a dev environment. The ports we're forwarding are mostly udp ports, except for the ssh port. The udp ports are for mosh which I highly recommend using instead of ssh. We also
-set the home location on the host as an env var which is useful when launching additional docker containers (such as app containers etc).
+set the home location on the host as an env var (DOCKER_HOST_HOME_LOCATION, needs to start with DOCKER_ to be set) which is useful when launching additional docker containers (such as app containers etc).
