@@ -17,5 +17,8 @@ RUN chmod +x /root/bootstrap.sh
 RUN /root/bootstrap.sh
 RUN rm /root/bootstrap.sh
 
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 22
-CMD ["/usr/sbin/runsvdir-start"]
+CMD ["/entrypoint.sh"]
