@@ -1,6 +1,14 @@
+# WARNING: Currently this can't be used anywhere since it relies on later images of trice-docker-app than what are actually pushed to the docker index (unless you're me and have those images locally).
+
 # My developer image for docker
 
-```docker build -t johnae/dev .``` builds the image
+```./build.sh``` builds the image
+
+Normally you would build an image like this:
+
+```docker build -t johnae/dev .```
+
+But since we're relying on things that can easily be forgotten (the id_rsa etc) the build.sh wrapper is the better way to go since it will fail with a reason if something is missing.
 
 You MUST place and encrypted id_rsa key in the repo (call it "id_rsa"). This key is used when building the image and is also put in the user account inside the image.
 You MUST also place "authorized_keys" within this repository (ignored in .gitignore) for any keys you wish to have access to the user account within the image.
