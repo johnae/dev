@@ -9,7 +9,7 @@ if [ ! -e authorized_keys ]; then
   echo "You must add an authorized_keys files to this directory (named authorized_keys), otherwise you can't login to the container"
   EXIT_NOW=1
 fi
-if [ "0"!="$EXIT_NOW" ]; then
+if [ $EXIT_NOW -ne 0 ]; then
   exit 1
 fi
 
