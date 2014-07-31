@@ -16,7 +16,7 @@ add-apt-repository ppa:mizuno-as/silversearcher-ag -y
 
 apt-get update
 
-apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh
+apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow
 
 ## set timezone
 ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
