@@ -18,6 +18,11 @@ apt-get update
 
 apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli
 
+## disable ssh password authentication
+sed -ri "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
+## if it was in there and not commented out, just do the same maneuver
+sed -ri "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
+
 ## set timezone
 ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
