@@ -26,6 +26,17 @@ sed -ri "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd
 ## set timezone
 ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
+## install golang
+pushd /tmp
+wget http://golang.org/dl/go1.3.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.3.linux-amd64.tar.gz
+rm go1.3.linux-amd64.tar.gz
+popd
+cat <<EOF>/etc/profile.d/golang.sh
+export PATH=$PATH:/usr/local/go/bin
+EOF
+chmod +x /etc/profile.d/golang.sh
+
 ##
 useradd --password `mkpasswd $PASSWORD` -m -s /bin/zsh -U $USER
 
