@@ -14,9 +14,17 @@ apt-get -y -q autoremove
 
 add-apt-repository ppa:mizuno-as/silversearcher-ag -y
 
+cat << EOF > /etc/apt/sources.list.d/erlang.list
+deb http://packages.erlang-solutions.com/ubuntu trusty contrib
+EOF
+
+wget http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+apt-key add erlang_solutions.asc
+rm -f erlang_solutions.asc
+
 apt-get update
 
-apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils
+apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang tree
 
 ## disable ssh password authentication
 sed -ri "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
