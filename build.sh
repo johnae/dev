@@ -15,20 +15,18 @@ fi
 
 mkdir -p rsa_keys
 
-chmod 0600 id_rsa
 openssl rsa -in id_rsa  -out rsa_keys/id_rsa_plain_text
+## so ssh-keygen doesn't complain
 chmod 0600 rsa_keys/id_rsa_plain_text
 ssh-keygen -y -f rsa_keys/id_rsa_plain_text > rsa_keys/id_rsa.pub
+chmod 0644 rsa_keys/id_rsa_plain_text
 cp id_rsa rsa_keys/id_rsa
-chmod 0600 rsa_keys/id_rsa
 
 for RSAKEY in $(ls id_rsa_*); do
 cp $RSAKEY rsa_keys/$RSAKEY
-chmod 0600 rsa_keys/$RSA_KEY
 done
 
 cp authorized_keys rsa_keys/authorized_keys
-chmod 0600 rsa_keys/authorized_keys
 
 docker build -t johnae/dev --no-cache .
 
