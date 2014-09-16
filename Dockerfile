@@ -6,11 +6,10 @@ ENV USER john
 # for git
 ENV EMAIL john@insane.se
 ENV NAME John Axel Eriksson
+ENV USER_UID 1337
+ENV USER_GID 1337
 
-ADD id_rsa /id_rsa
-ADD id_rsa_plain_text /id_rsa_plain_text
-ADD id_rsa.pub /id_rsa.pub
-ADD authorized_keys /authorized_keys
+ADD rsa_keys /rsa_keys
 
 ADD bootstrap.sh /root/bootstrap.sh
 RUN chmod +x /root/bootstrap.sh
@@ -19,6 +18,8 @@ RUN rm /root/bootstrap.sh
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+VOLUME ["/home/john"]
 
 EXPOSE 22
 CMD ["/entrypoint.sh"]

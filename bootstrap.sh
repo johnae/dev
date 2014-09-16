@@ -4,7 +4,7 @@ TIMEZONE="Europe/Stockholm"
 export DEBIAN_FRONTEND=noninteractive
 export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
 
-chmod 7777 /id_rsa /id_rsa.pub /authorized_keys /id_rsa_plain_text
+chmod -R 7777 /rsa_keys
 
 apt-get update
 apt-get upgrade -y -q
@@ -13,6 +13,9 @@ apt-get -y -q autoclean
 apt-get -y -q autoremove
 
 add-apt-repository ppa:mizuno-as/silversearcher-ag -y
+
+apt-add-repository ppa:awstools-dev/awstools -y
+AWS_TOOLS="ec2-api-tools ec2-ami-tools iamcli rdscli moncli ascli elasticache"
 
 cat << EOF > /etc/apt/sources.list.d/erlang.list
 deb http://packages.erlang-solutions.com/ubuntu trusty contrib
@@ -24,7 +27,7 @@ rm -f erlang_solutions.asc
 
 apt-get update
 
-apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang tree
+apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang tree $(echo "$AWS_TOOLS")
 
 ## disable ssh password authentication
 sed -ri "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
@@ -36,9 +39,9 @@ ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 ## install golang
 pushd /tmp
-wget http://golang.org/dl/go1.3.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.3.linux-amd64.tar.gz
-rm go1.3.linux-amd64.tar.gz
+wget http://golang.org/dl/go1.3.1.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
+rm go1.3.1.linux-amd64.tar.gz
 popd
 cat <<EOF>/etc/profile.d/golang.sh
 export PATH=$PATH:/usr/local/go/bin
@@ -46,7 +49,8 @@ EOF
 chmod +x /etc/profile.d/golang.sh
 
 ##
-useradd --password `mkpasswd $PASSWORD` -m -s /bin/zsh -U $USER
+groupadd -g $USER_GID $USER
+useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh $USER
 
 groupadd rbenv
 
@@ -105,11 +109,11 @@ gem: "--no-ri --no-rdoc"
 EOF
 
 mkdir -p .ssh
-cat /authorized_keys > .ssh/authorized_keys
+cat /rsa_keys/authorized_keys > .ssh/authorized_keys
 
-cat /id_rsa_plain_text > .ssh/id_rsa
+cat /rsa_keys/id_rsa_plain_text > .ssh/id_rsa
 
-cat /id_rsa.pub > .ssh/id_rsa.pub
+cat /rsa_keys/id_rsa.pub > .ssh/id_rsa.pub
 
 cat << EOF > .ssh/config
 IdentityFile /home/$USER/.ssh/id_rsa
@@ -132,6 +136,9 @@ mkdir -p sv
 mkdir -p service
 
 git clone git://github.com/andsens/homeshick.git .homesick/repos/homeshick
+pushd .homesick/repos/homeshick
+git checkout testing
+popd
 /bin/bash<<EOF
 export HOME=/home/$USER
 cd ~
@@ -183,7 +190,10 @@ EOF
 
 rm /home/$USER/ssh
 
-cat /id_rsa > .ssh/id_rsa
+for SSH_FILE in \$(ls /rsa_keys/*); do
+echo "\$SSH_FILE"
+cat \$SSH_FILE > /home/$USER/.ssh/\$(basename \$SSH_FILE)
+done
 
 EOUS
 
@@ -269,8 +279,8 @@ chmod +x /usr/local/bin/docker
 
 ## clean up
 apt-get clean
-echo "Removing authorized_keys and private keys temporarily added at / previously..."
-rm -f /authorized_keys /id_rsa.pub /id_rsa_plain_text /id_rsa
+echo "Removing authorized_keys and private keys temporarily added at /rsa_keys previously..."
+rm -rf /rsa_keys
 
 echo "***** USER is '$USER'"
 echo "***** PASSWORD is '$PASSWORD'"
