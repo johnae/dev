@@ -189,6 +189,7 @@ source ~/.zshrc
 EOF
 
 rm /home/$USER/ssh
+rm /home/$USER/.ssh/id_rsa*
 
 for SSH_FILE in \$(ls /rsa_keys/*); do
 echo "\$SSH_FILE"
