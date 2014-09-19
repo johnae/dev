@@ -44,7 +44,7 @@ tar -C /usr/local -xzf go$GOLANG_VERSION.linux-amd64.tar.gz
 rm go$GOLANG_VERSION.linux-amd64.tar.gz
 popd
 cat <<EOF>/etc/profile.d/golang.sh
-export PATH=$PATH:/usr/local/go/bin
+export PATH=\$PATH:/usr/local/go/bin
 EOF
 chmod +x /etc/profile.d/golang.sh
 
@@ -58,7 +58,7 @@ pushd /usr/local/elixir
 unzip /tmp/Precompiled.zip
 popd
 cat <<EOF>/etc/profile.d/elixir.sh
-export PATH=$PATH:/usr/local/elixir/bin
+export PATH=\$PATH:/usr/local/elixir/bin
 EOF
 chmod +x /etc/profile.d/elixir.sh
 ##
