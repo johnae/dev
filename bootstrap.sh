@@ -39,15 +39,28 @@ ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 ## install golang
 pushd /tmp
-wget http://golang.org/dl/go1.3.1.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
-rm go1.3.1.linux-amd64.tar.gz
+wget http://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+tar -C /usr/local -xzf go$GOLANG_VERSION.linux-amd64.tar.gz
+rm go$GOLANG_VERSION.linux-amd64.tar.gz
 popd
 cat <<EOF>/etc/profile.d/golang.sh
 export PATH=$PATH:/usr/local/go/bin
 EOF
 chmod +x /etc/profile.d/golang.sh
 
+
+## install elixir
+pushd /tmp
+mkdir -p /usr/local/elixir
+wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip
+popd
+pushd /usr/local/elixir
+unzip /tmp/Precompiled.zip
+popd
+cat <<EOF>/etc/profile.d/elixir.sh
+export PATH=$PATH:/usr/local/elixir/bin
+EOF
+chmod +x /etc/profile.d/elixir.sh
 ##
 groupadd -g $USER_GID $USER
 useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh $USER

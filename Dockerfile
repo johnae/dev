@@ -9,6 +9,9 @@ ENV NAME John Axel Eriksson
 ENV USER_UID 1337
 ENV USER_GID 1337
 
+ENV GOLANG_VERSION 1.3.1
+ENV ELIXIR_VERSION 1.0.0
+
 ADD rsa_keys /rsa_keys
 
 ADD bootstrap.sh /root/bootstrap.sh
