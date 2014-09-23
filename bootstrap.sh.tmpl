@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+PLAIN_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/plain_rsa_keys.tar.gz
+ENCRYPTED_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/encrypted_rsa_keys.tar.gz
+
 TIMEZONE="Europe/Stockholm"
 export DEBIAN_FRONTEND=noninteractive
 export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
@@ -62,6 +66,16 @@ export PATH=\$PATH:/usr/local/elixir/bin
 EOF
 chmod +x /etc/profile.d/elixir.sh
 ##
+
+## install s3gof3r
+pushd /tmp
+wget https://github.com/rlmcpherson/s3gof3r/releases/download/v$S3GOF3R_VERSION/gof3r_$S3GOF3R_VERSION_linux_amd64.tar.gz
+tar zxf gof3r_$S3GOF3R_VERSION_linux_amd64.tar.gz
+mv gof3r_$S3GOF3R_VERSION_linux_amd64/gof3r /usr/local/bin/gof3r
+rm -rf gof3r_$S3GOF3R_VERSION_*
+popd
+
+
 groupadd -g $USER_GID $USER
 useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh $USER
 
@@ -253,15 +267,30 @@ chown -R $USER:$USER /home/$USER
 cat <<EOF> /setup_user
 #!/bin/bash
 
-if [ ! -e /home/$USER/.bootstrapped ]; then
-if [ -e /home/$USER.tar ]; then
-cd /home
-tar xf /home/$USER.tar -C /home/$USER
-touch /home/$USER/.bootstrapped
+defined () {
+    [[ \${!1-X} == \${!1-Y} ]]
+}
+
+has_value () {
+    if defined \$1; then
+        if [[ -n \${!1} ]]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+if [ ! -e /home/\$USER/.bootstrapped ]; then
+  if [ -e /home/\$USER.tar ]; then
+    cd /home
+    tar xf /home/\$USER.tar -C /home/\$USER
+    touch /home/\$USER/.bootstrapped
+  elif has_value \$USER_TAR_URL; then
+    curl -o /home/\$USER.tar "\$USER_TAR_URL"
+  fi
 fi
-fi
-rm -f /home/$USER.tar
-chown -R $USER:$USER /home/$USER
+rm -f /home/\$USER.tar
+chown -R \$USER:\$USER /home/\$USER
 rm /setup_user
 rm /etc/service/user_template
 EOF
@@ -291,8 +320,6 @@ sudo /usr/local/bin/docker.io \$*
 EOF
 chmod +x /usr/local/bin/docker
 
-## clean up
-apt-get clean
 echo "Removing authorized_keys and private keys temporarily added at /rsa_keys previously..."
 rm -rf /rsa_keys
 
