@@ -1,14 +1,18 @@
 #!/bin/bash
+set -e
 
-
+## all "things" starting with TMPL_ will be replaced by the build script
 PLAIN_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/plain_rsa_keys.tar.gz
 ENCRYPTED_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/encrypted_rsa_keys.tar.gz
+
+curl "$PLAIN_RSA_KEYS_URL" | tar -C / -xvz
+curl "$ENCRYPTED_RSA_KEYS_URL" | tar -C / -xvz
+chmod -R 7777 /plain_rsa_keys /encrypted_rsa_keys
 
 TIMEZONE="Europe/Stockholm"
 export DEBIAN_FRONTEND=noninteractive
 export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
 
-chmod -R 7777 /rsa_keys
 
 apt-get update
 apt-get upgrade -y -q
@@ -69,17 +73,17 @@ chmod +x /etc/profile.d/elixir.sh
 
 ## install s3gof3r
 pushd /tmp
-wget https://github.com/rlmcpherson/s3gof3r/releases/download/v$S3GOF3R_VERSION/gof3r_$S3GOF3R_VERSION_linux_amd64.tar.gz
-tar zxf gof3r_$S3GOF3R_VERSION_linux_amd64.tar.gz
-mv gof3r_$S3GOF3R_VERSION_linux_amd64/gof3r /usr/local/bin/gof3r
-rm -rf gof3r_$S3GOF3R_VERSION_*
+wget https://github.com/rlmcpherson/s3gof3r/releases/download/v"$S3GOF3R_VERSION"/gof3r_"$S3GOF3R_VERSION"_linux_amd64.tar.gz
+tar zxf gof3r_"$S3GOF3R_VERSION"_linux_amd64.tar.gz
+mv gof3r_"$S3GOF3R_VERSION"_linux_amd64/gof3r /usr/local/bin/gof3r
+rm -rf gof3r_"$S3GOF3R_VERSION"_*
 popd
 
 
 groupadd -g $USER_GID $USER
 useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh $USER
 
-groupadd rbenv
+groupadd rbenv || true ## ignore if it's there already
 
 adduser $USER rbenv
 
@@ -136,11 +140,11 @@ gem: "--no-ri --no-rdoc"
 EOF
 
 mkdir -p .ssh
-cat /rsa_keys/authorized_keys > .ssh/authorized_keys
+cat /plain_rsa_keys/authorized_keys > .ssh/authorized_keys
 
-cat /rsa_keys/id_rsa_plain_text > .ssh/id_rsa
+cat /plain_rsa_keys/id_rsa > .ssh/id_rsa
 
-cat /rsa_keys/id_rsa.pub > .ssh/id_rsa.pub
+cat /plain_rsa_keys/id_rsa.pub > .ssh/id_rsa.pub
 
 cat << EOF > .ssh/config
 IdentityFile /home/$USER/.ssh/id_rsa
@@ -215,15 +219,19 @@ echo "Setting up zsh..."
 source ~/.zshrc
 EOF
 
-rm /home/$USER/ssh
 rm /home/$USER/.ssh/id_rsa*
+rm /home/$USER/.ssh/authorized_keys
 
-for SSH_FILE in \$(ls /rsa_keys/*); do
+for SSH_FILE in \$(ls /encrypted_rsa_keys/*); do
 echo "\$SSH_FILE"
 cat \$SSH_FILE > /home/$USER/.ssh/\$(basename \$SSH_FILE)
+chmod 0600 /home/$USER/.ssh/\$(basename \$SSH_FILE)
 done
 
 EOUS
+
+## remove any downloaded rsa files
+rm -rf /plain_rsa_keys /encrypted_rsa_keys
 
 mkdir -p /etc/sv
 mkdir -p /etc/service
@@ -285,8 +293,6 @@ if [ ! -e /home/\$USER/.bootstrapped ]; then
     cd /home
     tar xf /home/\$USER.tar -C /home/\$USER
     touch /home/\$USER/.bootstrapped
-  elif has_value \$USER_TAR_URL; then
-    curl -o /home/\$USER.tar "\$USER_TAR_URL"
   fi
 fi
 rm -f /home/\$USER.tar
@@ -320,8 +326,8 @@ sudo /usr/local/bin/docker.io \$*
 EOF
 chmod +x /usr/local/bin/docker
 
-echo "Removing authorized_keys and private keys temporarily added at /rsa_keys previously..."
-rm -rf /rsa_keys
+echo "Removing authorized_keys and private keys temporarily added at /plain_rsa_keys /encrypted_rsa_keys previously..."
+rm -rf /plain_rsa_keys /encrypted_rsa_keys
 
 echo "***** USER is '$USER'"
 echo "***** PASSWORD is '$PASSWORD'"
