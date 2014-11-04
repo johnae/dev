@@ -60,18 +60,18 @@ EOF
 chmod +x /etc/profile.d/golang.sh
 
 
-## install elixir
-pushd /tmp
-mkdir -p /usr/local/elixir
-wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip
-popd
-pushd /usr/local/elixir
-unzip /tmp/Precompiled.zip
-popd
-cat <<EOF>/etc/profile.d/elixir.sh
-export PATH=\$PATH:/usr/local/elixir/bin
-EOF
-chmod +x /etc/profile.d/elixir.sh
+## install elixir - can now be installed through erlang-solutions
+##pushd /tmp
+##mkdir -p /usr/local/elixir
+##wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip
+##popd
+##pushd /usr/local/elixir
+##unzip /tmp/Precompiled.zip
+##popd
+##cat <<EOF>/etc/profile.d/elixir.sh
+##export PATH=\$PATH:/usr/local/elixir/bin
+##EOF
+##chmod +x /etc/profile.d/elixir.sh
 ##
 
 ## install s3gof3r
