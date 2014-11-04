@@ -9,9 +9,9 @@ ENV NAME John Axel Eriksson
 ENV USER_UID 1337
 ENV USER_GID 1337
 
-ENV GOLANG_VERSION 1.3.1
-ENV ELIXIR_VERSION 1.0.0
-ENV S3GOF3R_VERSION 0.4.3
+ENV GOLANG_VERSION 1.3.3
+#ENV ELIXIR_VERSION 1.0.0 ## not used anymore
+ENV S3GOF3R_VERSION 0.4.8
 
 ADD bootstrap.sh /root/bootstrap.sh
 RUN chmod +x /root/bootstrap.sh &&\
