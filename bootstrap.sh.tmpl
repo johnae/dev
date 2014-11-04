@@ -35,7 +35,10 @@ rm -f erlang_solutions.asc
 
 apt-get update
 
-apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang tree $(echo "$AWS_TOOLS")
+apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang elixir tree parallel python3 python3-pip $(echo "$AWS_TOOLS")
+
+## install awscli via python3 pip for latest version
+pip3 install awscli
 
 ## disable ssh password authentication
 sed -ri "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
