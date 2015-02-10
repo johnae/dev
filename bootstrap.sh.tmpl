@@ -17,10 +17,17 @@ export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
 apt-get update
 apt-get upgrade -y -q
 apt-get dist-upgrade -y -q
-apt-get -y -q autoclean
-apt-get -y -q autoremove
 
 add-apt-repository ppa:mizuno-as/silversearcher-ag -y
+
+## mongodb 10gen key
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+
+add-apt-repository ppa:jon-severinsson/ffmpeg -y
+add-apt-repository ppa:nginx/development -y # for latest nginx, this is the mainline version which IS a stable version suitable for production according to nginx devs
+
+add-apt-repository ppa:webupd8team/java -y
 
 apt-add-repository ppa:awstools-dev/awstools -y
 AWS_TOOLS="ec2-api-tools ec2-ami-tools iamcli rdscli moncli ascli elasticache"
@@ -35,7 +42,56 @@ rm -f erlang_solutions.asc
 
 apt-get update
 
-apt-get install --force-yes -y -q vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang elixir tree parallel python3 python3-pip $(echo "$AWS_TOOLS")
+echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+
+apt-get install --force-yes -y -q adduser libfuse2 fuse libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev oracle-java7-installer ffmpeg nodejs nginx whois runit phantomjs mongodb-10gen vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client $(echo "$AWS_TOOLS")
+
+## now install dcmtk with utf-8 output
+curl -o /tmp/libiconv_1.13.1-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/libiconv_1.13.1-1_amd64.14.04.deb
+dpkg -i /tmp/libiconv_1.13.1-1_amd64.14.04.deb
+ldconfig -v
+rm -rf /tmp/libiconv*
+
+curl -o /tmp/dcmtk_3.6.1-20140617-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/dcmtk_3.6.1-20140617-1_amd64.14.04.deb
+dpkg -i /tmp/dcmtk_3.6.1-20140617-1_amd64.14.04.deb || true
+apt-get install -f --force-yes -y -q
+rm -rf /tmp/dcmtk*
+##
+
+## and install imagemagick q8
+mkdir -p /tmp/imagemagick
+pushd /tmp/imagemagick
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick-common_6.7.7.10-6ubuntu3local1_all.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick-dbg_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick-doc_6.7.7.10-6ubuntu3local1_all.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagick++-dev_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagick++5_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickcore-dev_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickcore5-extra_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickcore5_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickwand-dev_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickwand5_6.7.7.10-6ubuntu3local1_amd64.deb
+curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/perlmagick_6.7.7.10-6ubuntu3local1_amd64.deb
+for DEB in $(ls); do dpkg -i $DEB || true; done
+apt-get install -f --force-yes -y -q
+popd
+rm -rf /tmp/imagemagick
+
+## install forego (go implementation of foreman)
+mkdir -p /usr/local/bin
+pushd /usr/local/bin
+wget https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
+chmod +x forego
+popd
+
+
+
+
+
+
+
+
 
 ## install awscli via python3 pip for latest version
 pip3 install awscli
@@ -58,8 +114,8 @@ cat <<EOF>/etc/profile.d/golang.sh
 export PATH=\$PATH:/usr/local/go/bin
 EOF
 chmod +x /etc/profile.d/golang.sh
-
-
+## so we can now use go further down
+source /etc/profile.d/golang.sh
 ## install elixir - can now be installed through erlang-solutions
 ##pushd /tmp
 ##mkdir -p /usr/local/elixir
@@ -83,6 +139,68 @@ rm -rf gof3r_"$S3GOF3R_VERSION"_*
 popd
 
 
+
+### install rbenv and rubies
+
+pushd /usr/local
+test -e /usr/local/rbenv || git clone https://github.com/sstephenson/rbenv.git
+cat << EOF > /etc/profile.d/rbenv.sh
+export PATH="/usr/local/rbenv/bin:\$PATH"
+export RBENV_ROOT=/usr/local/rbenv
+eval "\$(rbenv init -)"
+upgrade_rbenv()
+{
+        pushd /usr/local/rbenv
+        git pull
+        popd
+        pushd /usr/local/rbenv/plugins/ruby-build
+        git pull
+        popd
+}
+EOF
+
+mkdir -p rbenv/plugins
+test -e /usr/local/rbenv/plugins/ruby-build || git clone https://github.com/sstephenson/ruby-build.git rbenv/plugins/ruby-build
+
+echo 'export PATH="/usr/local/rbenv/plugins/ruby-build/bin:$PATH"' > /etc/profile.d/ruby-build.sh
+
+cat << EOF > /etc/profile.d/jruby.sh
+jruby_client()
+{
+  export JRUBY_OPTS="--1.9 -J-noverify -Xcompile.invokedynamic=false -J-Dfile.encoding=UTF8 -J-Xms512m -J-Xmx2048m -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-XX:+UseCompressedOops --server"
+}
+
+jruby_server()
+{
+  export JRUBY_OPTS="--1.9 -J-noverify -Xcompile.invokedynamic=false -J-Dfile.encoding=UTF8 -J-Xms512m -J-Xmx4096m -J-XX:+TieredCompilation -J-XX:+UseCompressedOops --server"
+}
+EOF
+
+chmod +x /etc/profile.d/ruby-build.sh
+chmod +x /etc/profile.d/rbenv.sh
+chmod +x /etc/profile.d/jruby.sh
+
+
+source /etc/profile
+
+upgrade_rbenv
+
+test -e /usr/local/rbenv/versions/$RBENV_JRUBY || rbenv install $RBENV_JRUBY
+test -e /usr/local/rbenv/versions/$RBENV_MRI || rbenv install $RBENV_MRI
+
+## Regardless of version, these two will always work
+ln -s /usr/local/rbenv/versions/$RBENV_JRUBY /usr/local/rbenv/versions/jruby
+ln -s /usr/local/rbenv/versions/$RBENV_MRI /usr/local/rbenv/versions/mri
+
+jruby_client
+rbenv shell $RBENV_JRUBY
+gem install bundler --no-ri --no-rdoc
+
+rbenv shell $RBENV_MRI
+gem install bundler --no-ri --no-rdoc
+gem install md2man --no-ri --no-rdoc
+rbenv rehash
+
 groupadd -g $USER_GID $USER
 useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh $USER
 
@@ -90,8 +208,29 @@ groupadd rbenv || true ## ignore if it's there already
 
 adduser $USER rbenv
 
+rbenv global $RBENV_MRI
+
 chown -R $USER:rbenv /usr/local/rbenv
 chmod -R ug+rwx /usr/local/rbenv
+
+## allow passwordless sudo
+
+cat << EOF > /etc/sudoers.d/100-allow-app-user
+$USER ALL=(ALL) NOPASSWD:ALL
+EOF
+
+chown root:root /etc/sudoers.d/100-allow-app-user
+chmod 0440 /etc/sudoers.d/100-allow-app-user
+
+## install direnv -- needs md2man gem, see above
+pushd /tmp
+git clone https://github.com/zimbatm/direnv
+pushd direnv
+make install
+popd
+rm -rf direnv
+popd
+
 
 ## enable user local services for the configured user
 
@@ -332,6 +471,10 @@ chmod +x /usr/local/bin/docker
 
 echo "Removing authorized_keys and private keys temporarily added at /plain_rsa_keys /encrypted_rsa_keys previously..."
 rm -rf /plain_rsa_keys /encrypted_rsa_keys
+
+apt-get clean
+apt-get -y -q autoclean
+apt-get -y -q autoremove
 
 echo "***** USER is '$USER'"
 echo "***** PASSWORD is '$PASSWORD'"
