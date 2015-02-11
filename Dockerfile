@@ -42,7 +42,7 @@ RUN locale-gen en_US en_US.UTF-8 &&\
     apt-get update &&\
     apt-get upgrade -y -q &&\
     apt-get dist-upgrade -y -q &&\
-    apt-get install --force-yes -y -q build-essential devscripts curl sudo net-tools git software-properties-common python-software-properties libssl-dev wget ssl-cert bison openssl libreadline6 libreadline6-dev zlib1g zlib1g-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev libreadline6 libreadline6-dev cron logrotate &&\
+    apt-get install --force-yes -y -q build-essential devscripts curl sudo net-tools git software-properties-common python-software-properties libssl-dev wget ssl-cert bison openssl libreadline6 libreadline6-dev zlib1g zlib1g-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev libreadline6 libreadline6-dev libpq-dev cron logrotate &&\
     apt-get clean &&\
     apt-get -y -q autoclean &&\
     apt-get -y -q autoremove &&\
