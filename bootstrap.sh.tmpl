@@ -19,6 +19,9 @@ apt-get upgrade -y -q
 apt-get dist-upgrade -y -q
 
 add-apt-repository ppa:mizuno-as/silversearcher-ag -y
+apt-add-repository 'deb http://ppa.launchpad.net/anatol/tup/ubuntu precise main'
+## newer tmux
+add-apt-repository -y ppa:pi-rho/dev
 
 ## mongodb 10gen key
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
@@ -43,7 +46,7 @@ apt-get update
 
 echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
 
-apt-get install --force-yes -y -q adduser libfuse2 fuse libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils oracle-java7-installer nodejs nginx whois runit phantomjs mongodb-10gen vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client irssi $(echo "$AWS_TOOLS")
+apt-get install --force-yes -y -q adduser libfuse2 fuse libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils oracle-java7-installer nodejs nginx whois runit phantomjs mongodb-10gen vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli ant dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client irssi tup $(echo "$AWS_TOOLS")
 
 ## now install dcmtk with utf-8 output
 curl -o /tmp/libiconv_1.13.1-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/libiconv_1.13.1-1_amd64.14.04.deb
