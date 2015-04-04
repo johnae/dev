@@ -3,7 +3,7 @@ MAINTAINER John Axel Eriksson <john@insane.se>
 
 ENV USER john
 ENV RBENV_MRI 2.1.5
-ENV RBENV_JRUBY jruby-1.7.19
+#ENV RBENV_JRUBY jruby-1.7.19
 
 # for git
 ENV EMAIL john@insane.se
@@ -11,7 +11,7 @@ ENV NAME John Axel Eriksson
 ENV USER_UID 1337
 ENV USER_GID 1337
 
-ENV GOLANG_VERSION 1.4.1
+ENV GOLANG_VERSION 1.4.2
 #ENV ELIXIR_VERSION 1.0.0 ## not used anymore
 ENV S3GOF3R_VERSION 0.4.9
 
