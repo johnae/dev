@@ -22,6 +22,12 @@ add-apt-repository ppa:mizuno-as/silversearcher-ag -y
 apt-add-repository 'deb http://ppa.launchpad.net/anatol/tup/ubuntu precise main'
 ## newer tmux
 add-apt-repository -y ppa:pi-rho/dev
+## add postgres repo (for 9.4)
+cat << EOF > /etc/apt/sources.list.d/pgdg.list
+deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main
+EOF
+## and the repo key for PG
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 ## but we don't want any other packages from pi-rho
 mkdir -p /etc/apt/preferences.d
@@ -62,7 +68,7 @@ apt-get update
 #mongodb-10gen
 #libfuse2
 #fuse
-apt-get install --force-yes -y -q adduser libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client redis-tools irssi tup xclip ##$(echo "$AWS_TOOLS")
+apt-get install --force-yes -y -q adduser libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip ##$(echo "$AWS_TOOLS")
 
 ## now install dcmtk with utf-8 output
 #curl -o /tmp/libiconv_1.13.1-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/libiconv_1.13.1-1_amd64.14.04.deb
