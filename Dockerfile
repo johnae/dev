@@ -2,7 +2,8 @@ FROM ubuntu:14.04
 MAINTAINER John Axel Eriksson <john@insane.se>
 
 ENV USER john
-ENV RBENV_MRI 2.1.5
+ENV RBENV_MRIS 2.2.1 2.1.5 1.9.3-p551
+ENV DEFAULT_MRI 2.1.5
 #ENV RBENV_JRUBY jruby-1.7.19
 
 # for git
