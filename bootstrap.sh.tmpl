@@ -69,7 +69,18 @@ apt-get update
 #libfuse2
 #fuse
 
-apt-get install --force-yes -y -q adduser libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev entr ##$(echo "$AWS_TOOLS")
+apt-get install --force-yes -y -q adduser libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial ##$(echo "$AWS_TOOLS")
+
+pushd /tmp
+hg clone https://bitbucket.org/eradman/entr
+pushd entr
+hg update entr-3.1
+./configure
+make test
+make install
+popd
+rm -rf entr
+popd
 
 ## now install dcmtk with utf-8 output
 #curl -o /tmp/libiconv_1.13.1-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/libiconv_1.13.1-1_amd64.14.04.deb
