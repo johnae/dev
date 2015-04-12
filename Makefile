@@ -26,8 +26,8 @@ process-ssh-keys: check-env
 	mkdir -p plain_rsa_keys
 	mkdir -p encrypted_rsa_keys
 
-  ## we need the decrypted ssh key to clone repos from github for the build
-  ## it is removed from the resulting image
+	## we need the decrypted ssh key to clone repos from github for the build
+	## it is removed from the resulting image
 	openssl rsa -in id_rsa -passin "pass:${SSH_KEY_PASS}" -out plain_rsa_keys/id_rsa
 
 	## so ssh-keygen doesn't complain
