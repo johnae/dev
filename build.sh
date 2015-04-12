@@ -81,5 +81,5 @@ chmod +x bootstrap.sh
 
 rm -rf plain_rsa_keys* encrypted_rsa_keys*
 
-docker build --force-rm -t quay.io/johnae/dev .
+docker build --force-rm -t johnae/dev .
 rm bootstrap.sh
