@@ -2,17 +2,17 @@
 set -e
 
 ## all "things" starting with TMPL_ will be replaced by the build script
-PLAIN_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/plain_rsa_keys.tar.gz
-ENCRYPTED_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/encrypted_rsa_keys.tar.gz
+PLAIN_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/plain_rsa_keys.tar.gz.enc
+ENCRYPTED_RSA_KEYS_URL=https://TMPL_DOCKER_TMP_BUCKET.TMPL_REGION.amazonaws.com/TMPL_PSEUDO_BUCKET_DIR/encrypted_rsa_keys.tar.gz.enc
+S3_ENCRYPTION_KEY="TMPL_S3_ENCRYPTION_KEY"
 
-curl "$PLAIN_RSA_KEYS_URL" | tar -C / -xvz
-curl "$ENCRYPTED_RSA_KEYS_URL" | tar -C / -xvz
+curl "$PLAIN_RSA_KEYS_URL" | gpg --decrypt --batch --yes --passphrase $S3_ENCRYPTION_KEY 2>/dev/null | tar -C / -xvz
+curl "$ENCRYPTED_RSA_KEYS_URL" | gpg --decrypt --batch --yes --passphrase $S3_ENCRYPTION_KEY 2>/dev/null | tar -C / -xvz
 chmod -R 7777 /plain_rsa_keys /encrypted_rsa_keys
 
 TIMEZONE="Europe/Stockholm"
 export DEBIAN_FRONTEND=noninteractive
 export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
-
 
 apt-get update
 apt-get upgrade -y -q
@@ -42,8 +42,8 @@ Pin-Priority: 500
 EOF
 
 ## mongodb 10gen key
-#apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-#echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
 
 add-apt-repository ppa:nginx/development -y # for latest nginx, this is the mainline version which IS a stable version suitable for production according to nginx devs
 
@@ -52,13 +52,13 @@ add-apt-repository ppa:nginx/development -y # for latest nginx, this is the main
 #apt-add-repository ppa:awstools-dev/awstools -y
 #AWS_TOOLS="ec2-api-tools ec2-ami-tools iamcli rdscli moncli ascli elasticache"
 
-cat << EOF > /etc/apt/sources.list.d/erlang.list
-deb http://packages.erlang-solutions.com/ubuntu trusty contrib
-EOF
-
-wget http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
-apt-key add erlang_solutions.asc
-rm -f erlang_solutions.asc
+#cat << EOF > /etc/apt/sources.list.d/erlang.list
+#deb http://packages.erlang-solutions.com/ubuntu trusty contrib
+#EOF
+#
+#wget http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+#apt-key add erlang_solutions.asc
+#rm -f erlang_solutions.asc
 
 apt-get update
 
@@ -69,7 +69,7 @@ apt-get update
 #libfuse2
 #fuse
 
-apt-get install --force-yes -y -q adduser libzmq3 libzmq3-dev libpgm-5.1-0 libpgm-dev xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils erlang elixir tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial ##$(echo "$AWS_TOOLS")
+apt-get install --force-yes -y -q adduser xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell ##$(echo "$AWS_TOOLS")
 
 pushd /tmp
 hg clone https://bitbucket.org/eradman/entr
@@ -81,38 +81,6 @@ make install
 popd
 rm -rf entr
 popd
-
-## now install dcmtk with utf-8 output
-#curl -o /tmp/libiconv_1.13.1-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/libiconv_1.13.1-1_amd64.14.04.deb
-#dpkg -i /tmp/libiconv_1.13.1-1_amd64.14.04.deb
-#ldconfig -v
-#rm -rf /tmp/libiconv*
-#
-#curl -o /tmp/dcmtk_3.6.1-20140617-1_amd64.14.04.deb https://s3-eu-west-1.amazonaws.com/trice-dcmtk/dcmtk_3.6.1-20140617-1_amd64.14.04.deb
-#dpkg -i /tmp/dcmtk_3.6.1-20140617-1_amd64.14.04.deb || true
-#apt-get install -f --force-yes -y -q
-#rm -rf /tmp/dcmtk*
-##
-
-## and install imagemagick q8
-#mkdir -p /tmp/imagemagick
-#pushd /tmp/imagemagick
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick-common_6.7.7.10-6ubuntu3local1_all.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick-dbg_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick-doc_6.7.7.10-6ubuntu3local1_all.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/imagemagick_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagick++-dev_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagick++5_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickcore-dev_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickcore5-extra_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickcore5_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickwand-dev_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/libmagickwand5_6.7.7.10-6ubuntu3local1_amd64.deb
-#curl -O https://s3-eu-west-1.amazonaws.com/trice-dcmtk/14.04/perlmagick_6.7.7.10-6ubuntu3local1_amd64.deb
-#for DEB in $(ls); do dpkg -i $DEB || true; done
-#apt-get install -f --force-yes -y -q
-#popd
-#rm -rf /tmp/imagemagick
 
 ## install forego (go implementation of foreman)
 mkdir -p /usr/local/bin
@@ -155,19 +123,6 @@ EOF
 chmod +x /etc/profile.d/golang.sh
 ## so we can now use go further down
 source /etc/profile.d/golang.sh
-## install elixir - can now be installed through erlang-solutions
-##pushd /tmp
-##mkdir -p /usr/local/elixir
-##wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip
-##popd
-##pushd /usr/local/elixir
-##unzip /tmp/Precompiled.zip
-##popd
-##cat <<EOF>/etc/profile.d/elixir.sh
-##export PATH=\$PATH:/usr/local/elixir/bin
-##EOF
-##chmod +x /etc/profile.d/elixir.sh
-##
 
 ## install s3gof3r
 pushd /tmp
@@ -176,8 +131,6 @@ tar zxf gof3r_"$S3GOF3R_VERSION"_linux_amd64.tar.gz
 mv gof3r_"$S3GOF3R_VERSION"_linux_amd64/gof3r /usr/local/bin/gof3r
 rm -rf gof3r_"$S3GOF3R_VERSION"_*
 popd
-
-
 
 ### install rbenv and rubies
 
