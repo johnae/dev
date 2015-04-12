@@ -64,8 +64,8 @@ build: check-env process-ssh-keys
 	docker build --force-rm -t ${DOCKER_IMAGE_NAME} .
 
   ## remove the files on S3
-  gof3r rm --endpoint s3-${AWS_DEFAULT_REGION}.amazonaws.com s3://${TMP_BUCKET}/${BUCKET_PSEUDO_DIR}/encrypted_rsa_keys.tar.gz.enc
-  gof3r rm --endpoint s3-${AWS_DEFAULT_REGION}.amazonaws.com s3://${TMP_BUCKET}/${BUCKET_PSEUDO_DIR}/plain_rsa_keys.tar.gz.enc
+  ./gof3r rm --endpoint s3-${AWS_DEFAULT_REGION}.amazonaws.com s3://${TMP_BUCKET}/${BUCKET_PSEUDO_DIR}/encrypted_rsa_keys.tar.gz.enc
+  ./gof3r rm --endpoint s3-${AWS_DEFAULT_REGION}.amazonaws.com s3://${TMP_BUCKET}/${BUCKET_PSEUDO_DIR}/plain_rsa_keys.tar.gz.enc
 
 push:
 	docker push ${DOCKER_IMAGE_NAME}:latest
