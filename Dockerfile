@@ -14,7 +14,7 @@ ENV USER_GID 1337
 
 ENV GOLANG_VERSION 1.4.2
 #ENV ELIXIR_VERSION 1.0.0 ## not used anymore
-ENV S3GOF3R_VERSION 0.4.9
+ENV S3GOF3R_VERSION 0.4.10
 
 RUN echo 'deb http://archive.ubuntu.com/ubuntu/ trusty main' | tee /etc/apt/sources.list &&\
     echo 'deb-src http://archive.ubuntu.com/ubuntu/ trusty main' | tee -a /etc/apt/sources.list &&\
