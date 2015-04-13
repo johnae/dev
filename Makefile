@@ -21,6 +21,9 @@ exists-%:
 		exit 1; \
 	fi
 
+print-%:
+	@echo $*=$($*)
+
 process-ssh-keys: check-env
 	rm -rf plain_rsa_keys* encrypted_rsa_keys*
 	mkdir -p plain_rsa_keys
