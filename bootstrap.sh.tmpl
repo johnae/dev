@@ -49,9 +49,6 @@ add-apt-repository ppa:nginx/development -y # for latest nginx, this is the main
 
 #add-apt-repository ppa:webupd8team/java -y
 
-#apt-add-repository ppa:awstools-dev/awstools -y
-#AWS_TOOLS="ec2-api-tools ec2-ami-tools iamcli rdscli moncli ascli elasticache"
-
 #cat << EOF > /etc/apt/sources.list.d/erlang.list
 #deb http://packages.erlang-solutions.com/ubuntu trusty contrib
 #EOF
@@ -69,7 +66,7 @@ apt-get update
 #libfuse2
 #fuse
 
-apt-get install --force-yes -y -q adduser xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow transmission-cli dnsutils tree parallel python3 python3-pip mutt mutt-patched w3m task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell ##$(echo "$AWS_TOOLS")
+apt-get install --force-yes -y -q adduser xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow dnsutils tree parallel python3 python3-pip mutt mutt-patched task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell
 
 pushd /tmp
 hg clone https://bitbucket.org/eradman/entr
