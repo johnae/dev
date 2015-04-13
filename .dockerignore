@@ -1,0 +1,6 @@
+.git/
+.envrc
+README.md
+Makefile
+gof3r
+bootstrap.sh.tmpl
