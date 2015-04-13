@@ -16,9 +16,6 @@ for LINE in $(env); do
   IFS=$OIFS
 done
 
-
-
 chmod +x /etc/profile.d/docker-env.sh
-
 ## and finally start whatever services are defined
 /usr/sbin/runsvdir-start
