@@ -45,7 +45,7 @@ EOF
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
 
-add-apt-repository ppa:nginx/development -y # for latest nginx, this is the mainline version which IS a stable version suitable for production according to nginx devs
+#add-apt-repository ppa:nginx/development -y # for latest nginx, this is the mainline version which IS a stable version suitable for production according to nginx devs
 
 #add-apt-repository ppa:webupd8team/java -y
 
@@ -66,7 +66,7 @@ apt-get update
 #libfuse2
 #fuse
 
-apt-get install --force-yes -y -q adduser xz-utils nodejs nginx whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow dnsutils tree parallel python3 python3-pip mutt mutt-patched task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell
+apt-get install --force-yes -y -q adduser xz-utils nodejs whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow dnsutils tree parallel python3 python3-pip mutt mutt-patched task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell
 
 pushd /tmp
 hg clone https://bitbucket.org/eradman/entr
