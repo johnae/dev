@@ -53,9 +53,9 @@ ADD bootstrap.sh /root/bootstrap.sh
 RUN chmod +x /root/bootstrap.sh &&\
     /root/bootstrap.sh &&\
     rm /root/bootstrap.sh &&\
-    apt-get clean || true &&\
-    apt-get -y -q autoclean || true &&\
-    apt-get -y -q autoremove || true &&\
+    apt-get clean &&\
+    apt-get -y -q autoclean &&\
+    apt-get -y -q autoremove &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ADD entrypoint.sh /entrypoint.sh
