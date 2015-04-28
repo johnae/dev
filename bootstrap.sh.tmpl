@@ -66,7 +66,10 @@ apt-get update
 #libfuse2
 #fuse
 
-apt-get install --force-yes -y -q adduser xz-utils nodejs whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow dnsutils tree parallel python3 python3-pip mutt mutt-patched task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell apache2-utils valgrind
+apt-get install --force-yes -y -q adduser xz-utils nodejs npm whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow dnsutils tree parallel python3 python3-pip mutt mutt-patched task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell apache2-utils valgrind
+
+## node is installed as nodejs, link it
+ln -s /usr/bin/nodejs /usr/bin/node 
 
 pushd /tmp
 hg clone https://bitbucket.org/eradman/entr
