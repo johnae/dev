@@ -18,4 +18,4 @@ done
 
 chmod +x /etc/profile.d/docker-env.sh
 ## and finally start whatever services are defined
-/usr/sbin/runsvdir-start
+exec /usr/sbin/runsvdir-start
