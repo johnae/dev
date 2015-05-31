@@ -10,66 +10,8 @@ curl "$PLAIN_RSA_KEYS_URL" | gpg --decrypt --batch --yes --passphrase $S3_ENCRYP
 curl "$ENCRYPTED_RSA_KEYS_URL" | gpg --decrypt --batch --yes --passphrase $S3_ENCRYPTION_KEY 2>/dev/null | tar -C / -xvz
 chmod -R 7777 /plain_rsa_keys /encrypted_rsa_keys
 
-TIMEZONE="Europe/Stockholm"
 export DEBIAN_FRONTEND=noninteractive
 export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
-
-apt-get update
-apt-get upgrade -y -q
-apt-get dist-upgrade -y -q
-
-add-apt-repository ppa:mizuno-as/silversearcher-ag -y
-apt-add-repository 'deb http://ppa.launchpad.net/anatol/tup/ubuntu precise main'
-## newer tmux
-add-apt-repository -y ppa:pi-rho/dev
-## add postgres repo (for 9.4)
-cat << EOF > /etc/apt/sources.list.d/pgdg.list
-deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main
-EOF
-## and the repo key for PG
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
-## but we don't want any other packages from pi-rho
-mkdir -p /etc/apt/preferences.d
-cat << EOF > /etc/apt/preferences.d/pi-rho-dev-pin-400
-Package:  *
-Pin: release o=LP-PPA-pi-rho-dev
-Pin-Priority: 400
-
-Package:  *tmux*
-Pin: release o=LP-PPA-pi-rho-dev
-Pin-Priority: 500
-EOF
-
-## mongodb 10gen key
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
-
-#add-apt-repository ppa:nginx/development -y # for latest nginx, this is the mainline version which IS a stable version suitable for production according to nginx devs
-
-#add-apt-repository ppa:webupd8team/java -y
-
-#cat << EOF > /etc/apt/sources.list.d/erlang.list
-#deb http://packages.erlang-solutions.com/ubuntu trusty contrib
-#EOF
-#
-#wget http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
-#apt-key add erlang_solutions.asc
-#rm -f erlang_solutions.asc
-
-apt-get update
-
-#echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-#oracle-java7-installer 
-#ant
-#mongodb-10gen
-#libfuse2
-#fuse
-
-apt-get install --force-yes -y -q adduser xz-utils nodejs npm whois runit phantomjs vim-nox zsh tmux ssh openssh-server aptitude silversearcher-ag expect mosh git-flow dnsutils tree parallel python3 python3-pip mutt mutt-patched task libjson-perl postgresql-client-9.4 redis-tools irssi tup xclip libgtkmm-3.0-1 libcurl4-openssl-dev libffi-dev imagemagick libmagickcore-dev libmagickcore-extra libmagickwand-dev mercurial mongodb-org-shell apache2-utils valgrind
-
-## node is installed as nodejs, link it
-ln -s /usr/bin/nodejs /usr/bin/node 
 
 pushd /tmp
 hg clone https://bitbucket.org/eradman/entr
@@ -107,9 +49,6 @@ pip3 install powerline-status || true
 sed -ri "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 ## if it was in there and not commented out, just do the same maneuver
 sed -ri "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-
-## set timezone
-ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 ## install golang
 pushd /tmp
