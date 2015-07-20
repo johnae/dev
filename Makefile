@@ -4,6 +4,8 @@ GIT_BRANCH             := $(shell git symbolic-ref --short HEAD)
 GIT_SHORT_SHA          := $(shell git rev-parse --short ${GIT_BRANCH})
 DOCKER_IMAGE_NAME      := johnae/dev
 DOCKER_BRANCH          := $(shell echo -n ${GIT_BRANCH} | sed 's/\//_/g' | sed 's/[!?\#]//g')
+NOW                    := $(shell date '+%F-T-%H-%M-%S%Z')
+
 # just using latest here
 #DOCKER_TAG             := ${DOCKER_BRANCH}-${GIT_SHORT_SHA}
 #DOCKER_FULL_IMAGE_NAME := ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
@@ -72,7 +74,9 @@ build: check-env process-ssh-keys
 
 	chmod +x bootstrap.sh
 
-	docker build --force-rm -t ${DOCKER_IMAGE_NAME} .
+	docker build --force-rm -t ${DOCKER_IMAGE_NAME}:${GIT_BRANCH}-${GIT_SHORT_SHA}-${NOW} .
+	docker rmi ${DOCKER_IMAGE_NAME}:latest || true
+	docker tag -f ${DOCKER_IMAGE_NAME}:${GIT_BRANCH}-${GIT_SHORT_SHA}-${NOW} ${DOCKER_IMAGE_NAME}:latest
 
 	## remove the files on S3
 	./gof3r rm --endpoint s3-${AWS_DEFAULT_REGION}.amazonaws.com s3://${TMP_BUCKET}/${BUCKET_PSEUDO_DIR}/encrypted_rsa_keys.tar.gz.enc
@@ -90,7 +94,7 @@ clean:
 
 clean-old-images:
 	$(eval LATEST_SHA := $(shell docker images | tail -n +2 | grep "${DOCKER_IMAGE_NAME}" | grep "latest" | awk '{print $$3}'))
-	@ docker images | \
+	-@docker images | \
 		tail -n +2 | \
 		grep "${DOCKER_IMAGE_NAME}" | \
 		awk '{print $$3}' | \
