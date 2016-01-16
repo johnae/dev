@@ -45,6 +45,11 @@ RUN locale-gen en_US en_US.UTF-8 &&\
     ln -s /usr/bin/nodejs /usr/bin/node &&\
 ## imagemagick is stupid
     ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-*/bin-Q16/Magick-config /usr/bin/Magick-config &&\
+## neovim
+    add-apt-repository ppa:neovim-ppa/unstable -y &&\
+    apt-get update &&\
+    DEBIAN_FRONTEND=noninteractive apt-get install --force-yes -y -q neovim &&\
+    pip3 install --user neovim &&\
     apt-get clean &&\
     apt-get -y -q autoclean &&\
     apt-get -y -q autoremove &&\
