@@ -13,64 +13,6 @@ chmod -R 7777 /plain_rsa_keys /encrypted_rsa_keys
 export DEBIAN_FRONTEND=noninteractive
 export PASSWORD=$(openssl rand -base64 32 | openssl md5 | awk '{print $2}')
 
-pushd /tmp
-hg clone https://bitbucket.org/eradman/entr
-pushd entr
-hg update entr-3.5
-./configure
-make test
-make install
-popd
-rm -rf entr
-popd
-
-## install forego (go implementation of foreman)
-#mkdir -p /usr/local/bin
-#pushd /usr/local/bin
-#wget https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
-#chmod +x forego
-#popd
-
-## install statically compiled ffmpeg
-#pushd /tmp
-#wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
-#tar -xJf ffmpeg-release-64bit-static.tar.xz
-#mv ffmpeg-*-64bit-static/ffmpeg /usr/local/bin/ffmpeg
-#chmod +x /usr/local/bin/ffmpeg
-#popd
-
-## install awscli via python3 pip for latest version
-#pip3 install awscli || true
-
-## install powerline status
-pip3 install powerline-status || true
-
-## disable ssh password authentication
-sed -ri "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-## if it was in there and not commented out, just do the same maneuver
-sed -ri "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-
-## install golang
-pushd /tmp
-wget http://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-tar -C /usr/local -xzf go$GOLANG_VERSION.linux-amd64.tar.gz
-rm go$GOLANG_VERSION.linux-amd64.tar.gz
-popd
-cat <<EOF>/etc/profile.d/golang.sh
-export PATH=\$PATH:/usr/local/go/bin
-EOF
-chmod +x /etc/profile.d/golang.sh
-## so we can now use go further down
-source /etc/profile.d/golang.sh
-
-## install s3gof3r
-#pushd /tmp
-#wget https://github.com/rlmcpherson/s3gof3r/releases/download/v"$S3GOF3R_VERSION"/gof3r_"$S3GOF3R_VERSION"_linux_amd64.tar.gz
-#tar zxf gof3r_"$S3GOF3R_VERSION"_linux_amd64.tar.gz
-#mv gof3r_"$S3GOF3R_VERSION"_linux_amd64/gof3r /usr/local/bin/gof3r
-#rm -rf gof3r_"$S3GOF3R_VERSION"_*
-#popd
-
 ### install rbenv and rubies
 
 pushd /usr/local
@@ -95,28 +37,13 @@ test -e /usr/local/rbenv/plugins/ruby-build || git clone https://github.com/sste
 
 echo 'export PATH="/usr/local/rbenv/plugins/ruby-build/bin:$PATH"' > /etc/profile.d/ruby-build.sh
 
-#cat << EOF > /etc/profile.d/jruby.sh
-#jruby_client()
-#{
-#  export JRUBY_OPTS="--1.9 -J-noverify -Xcompile.invokedynamic=false -J-Dfile.encoding=UTF8 -J-Xms512m -J-Xmx2048m -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-XX:+UseCompressedOops --server"
-#}
-#
-#jruby_server()
-#{
-#  export JRUBY_OPTS="--1.9 -J-noverify -Xcompile.invokedynamic=false -J-Dfile.encoding=UTF8 -J-Xms512m -J-Xmx4096m -J-XX:+TieredCompilation -J-XX:+UseCompressedOops --server"
-#}
-#EOF
-
 chmod +x /etc/profile.d/ruby-build.sh
 chmod +x /etc/profile.d/rbenv.sh
-#chmod +x /etc/profile.d/jruby.sh
-
 
 source /etc/profile
 
 upgrade_rbenv
 
-#test -e /usr/local/rbenv/versions/$RBENV_JRUBY || rbenv install $RBENV_JRUBY
 for RBENV_MRI in $RBENV_MRIS; do
   test -e /usr/local/rbenv/versions/$RBENV_MRI || rbenv install $RBENV_MRI
   rbenv shell $RBENV_MRI
@@ -127,18 +54,10 @@ for RBENV_MRI in $RBENV_MRIS; do
 done
 
 ## Regardless of version, these two will always work
-#ln -s /usr/local/rbenv/versions/$RBENV_JRUBY /usr/local/rbenv/versions/jruby
 ln -s /usr/local/rbenv/versions/$DEFAULT_MRI /usr/local/rbenv/versions/mri
-
-#jruby_client
-#rbenv shell $RBENV_JRUBY
-#gem install bundler --no-ri --no-rdoc
 
 rbenv shell $DEFAULT_MRI
 rbenv global $DEFAULT_MRI
-gem install bundler --no-ri --no-rdoc
-gem install md2man --no-ri --no-rdoc
-rbenv rehash
 
 groupadd -g $USER_GID $USER
 useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh $USER
@@ -146,8 +65,6 @@ useradd -g $USER_GID -u $USER_UID --password `mkpasswd $PASSWORD` -m -s /bin/zsh
 groupadd rbenv || true ## ignore if it's there already
 
 adduser $USER rbenv
-
-rbenv global $RBENV_MRI
 
 chown -R $USER:rbenv /usr/local/rbenv
 chmod -R ug+rwx /usr/local/rbenv
@@ -160,16 +77,6 @@ EOF
 
 chown root:root /etc/sudoers.d/100-allow-app-user
 chmod 0440 /etc/sudoers.d/100-allow-app-user
-
-## install direnv -- needs md2man gem, see above
-pushd /tmp
-git clone https://github.com/zimbatm/direnv
-pushd direnv
-make install
-popd
-rm -rf direnv
-popd
-
 
 ## enable user local services for the configured user
 
